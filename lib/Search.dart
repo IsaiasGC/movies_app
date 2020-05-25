@@ -1,16 +1,192 @@
 import 'package:flutter/material.dart';
 
 class Search extends StatefulWidget{
+  const Search({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => SearchForm();
 }
 
 class SearchForm extends State<Search>{
+  final List<String> kEnglishWords;
+   _MySearchDelegate _delegate;
+
+  SearchForm()
+      : kEnglishWords = List.from(Set.from(['Hello', 'Bye', 'What', 'You']));
+      
+  
+  @override
+  void initState() {
+    super.initState();
+    _delegate = _MySearchDelegate(kEnglishWords);
+  }
+
   @override
   Widget build(BuildContext context){
     return Scaffold(
-      appBar: AppBar(title: Text('Search'),),
+      appBar: AppBar(
+        brightness: Brightness.dark,
+        automaticallyImplyLeading: false,
+        title: Text('Search Movies'),
+        actions: <Widget>[
+          IconButton(
+            tooltip: 'Search',
+            icon: const Icon(Icons.search),
+            onPressed: () async {
+              final String selected = await showSearch<String>(
+                context: context,
+                delegate: _delegate,
+              );
+              if (selected != null) {
+                Scaffold.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('You have selected the word: $selected'),
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
       body: Center(child: Icon(Icons.network_check, size: 64.0, color: Colors.redAccent)),
+    );
+  }
+}
+
+
+// Defines the content of the search page in showSearch().
+// SearchDelegate has a member query which is the query string.
+class _MySearchDelegate extends SearchDelegate<String> {
+  final List<String> _words;
+  final List<String> _history;
+
+  _MySearchDelegate(List<String> words)
+      : _words = words,
+        _history = <String>['apple', 'hello', 'world', 'flutter'],
+        super();
+
+  // Leading icon in search bar.
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      tooltip: 'Back',
+      icon: AnimatedIcon(
+        icon: AnimatedIcons.menu_arrow,
+        progress: transitionAnimation,
+      ),
+      onPressed: () {
+        // SearchDelegate.close() can return vlaues, similar to Navigator.pop().
+        this.close(context, null);
+      },
+    );
+  }
+
+  // Widget of result page.
+  @override
+  Widget buildResults(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text('You have selected the word:'),
+            GestureDetector(
+              onTap: () {
+                // Returns this.query as result to previous screen, c.f.
+                // showSearch() above.
+                this.close(context, this.query);
+              },
+              child: Text(
+                this.query,
+                style: Theme.of(context)
+                    .textTheme
+                    .display1
+                    .copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Suggestions list while typing (this.query).
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    final Iterable<String> suggestions = this.query.isEmpty
+        ? _history
+        : _words.where((word) => word.startsWith(query));
+
+    return _SuggestionList(
+      query: this.query,
+      suggestions: suggestions.toList(),
+      onSelected: (String suggestion) {
+        this.query = suggestion;
+        this._history.insert(0, suggestion);
+        showResults(context);
+      },
+    );
+  }
+
+  // Action buttons at the right of search bar.
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return <Widget>[
+      query.isEmpty
+          ? IconButton(
+              tooltip: 'Voice Search',
+              icon: const Icon(Icons.mic),
+              onPressed: () {
+                this.query = 'TODO: implement voice input';
+              },
+            )
+          : IconButton(
+              tooltip: 'Clear',
+              icon: const Icon(Icons.clear),
+              onPressed: () {
+                query = '';
+                showSuggestions(context);
+              },
+            )
+    ];
+  }
+}
+// Suggestions list widget displayed in the search page.
+class _SuggestionList extends StatelessWidget {
+  const _SuggestionList({this.suggestions, this.query, this.onSelected});
+
+  final List<String> suggestions;
+  final String query;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme.subhead;
+    return ListView.builder(
+      itemCount: suggestions.length,
+      itemBuilder: (BuildContext context, int i) {
+        final String suggestion = suggestions[i];
+        return ListTile(
+          leading: query.isEmpty ? Icon(Icons.history) : Icon(null),
+          // Highlight the substring that matched the query.
+          title: RichText(
+            text: TextSpan(
+              text: suggestion.substring(0, query.length),
+              style: textTheme.copyWith(fontWeight: FontWeight.bold),
+              children: <TextSpan>[
+                TextSpan(
+                  text: suggestion.substring(query.length),
+                  style: textTheme,
+                ),
+              ],
+            ),
+          ),
+          onTap: () {
+            onSelected(suggestion);
+          },
+        );
+      },
     );
   }
 }
