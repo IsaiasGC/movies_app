@@ -58,43 +58,45 @@ class PopularForm extends State<Popular>{
                   actionExtentRatio: 0.25,
                   child: Card(
                     elevation: 8.0,
-                    margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [ 
-                        Image.network("https://image.tmdb.org/t/p/w500"+movies[index]['backdrop_path'], width: 300,height: 300,),
-                        Container(
-                          decoration: BoxDecoration(color: Color.fromRGBO(121, 181, 237, .9)),
+                    margin: EdgeInsets.symmetric(horizontal: 5.0, vertical: 2.5),
+                    child: Container(
+                          // decoration: BoxDecoration(color: Color.fromRGBO(50, 180, 237, .8)),
                           child: ListTile(
-                            contentPadding: EdgeInsets.symmetric(horizontal: 20.0,vertical: 10.0),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 2.5),
                             leading: Container(
-                                padding: EdgeInsets.only(right: 12.0),
-                                decoration: BoxDecoration(
-                                  border: Border( right: BorderSide(width: 1.0, color: Colors.black))
-                                ),
-                                child: Icon(Icons.language, color: Colors.black)
-                              ),
-                              title: Text(
-                                  movies[index]['title'],
-                                  style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Row(
-                                children: <Widget>[
-                                  //Icon(Icons.touch_app, color: Colors.yellowAccent),
-                                  Text(movies[index]['release_date'], style: TextStyle(color: Colors.black))
-                                ],
-                              ),
-                              trailing: Icon(Icons.keyboard_arrow_right, color: Colors.black, size: 30.0,),
+                              padding: EdgeInsets.only(right: 5.0),
+                              // decoration: BoxDecoration(
+                              //   border: Border( right: BorderSide(width: 1.0, color: Colors.black))
+                              // ),
+                              child: Image.network("https://image.tmdb.org/t/p/w500"+movies[index]['backdrop_path'],),
                             ),
+                            title: Text(
+                              movies[index]['title'],
+                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Row(
+                              children: <Widget>[
+                                //Icon(Icons.touch_app, color: Colors.yellowAccent),
+                                Text(movies[index]['release_date'], style: TextStyle(color: Colors.black))
+                              ],
+                            ),
+                            // trailing: Icon(Icons.keyboard_arrow_right, color: Colors.black, size: 30.0,),
+                          ),
                         ),
-                      ],
-                    ),
                   ),
                   actions: <Widget>[
                     IconSlideAction(
                       caption: 'add to favorite',
-                      color: Color.fromARGB(255, 23, 162, 184),
+                      color: Color.fromARGB(255, 189, 100, 10),
                       icon: Icons.star,
+                      onTap: () => {
+                        
+                      },
+                    ),
+                    IconSlideAction(
+                      caption: 'view detail',
+                      color: Color.fromARGB(255, 23, 162, 184),
+                      icon: Icons.open_in_new,
                       onTap: () => {
                         
                       },
