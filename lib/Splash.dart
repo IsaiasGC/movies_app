@@ -28,7 +28,7 @@ class SplashForm extends State<Splash>{
         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
       ),
       gradientBackground: new LinearGradient(
-        colors: [Colors.redAccent, Colors.black54], 
+        colors: [Colors.red, Colors.black], 
         begin: Alignment.center, 
         end: Alignment.bottomCenter
       ),
