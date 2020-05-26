@@ -19,6 +19,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  video_player:
   http: ^0.12.1
   flutter_slidable: "^0.5.4"
   splashscreen: ^1.2.0

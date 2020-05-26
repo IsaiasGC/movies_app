@@ -2,6 +2,9 @@ import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:http/http.dart' as http;
+import 'dart:developer';
+
+import 'Modal.dart';
 
 class Popular extends StatefulWidget{
   @override
@@ -45,9 +48,9 @@ class PopularForm extends State<Popular>{
   @override
   Widget build(BuildContext context){
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text("Popular"),
-      // ),
+       appBar: AppBar(
+         title: Text("Popular"),
+       ),
       body: isLoading ? Center(child: CircularProgressIndicator(),)
             : ListView.builder(
               itemCount: movies==null ? 0 : 15,
@@ -89,7 +92,7 @@ class PopularForm extends State<Popular>{
                       color: Color.fromARGB(255, 189, 100, 10),
                       icon: Icons.star,
                       onTap: () => {
-                        
+
                       },
                     ),
                     IconSlideAction(
@@ -97,7 +100,7 @@ class PopularForm extends State<Popular>{
                       color: Color.fromARGB(255, 23, 162, 184),
                       icon: Icons.open_in_new,
                       onTap: () => {
-                        
+                        Modal.showModal(this.context,movies,index)
                       },
                     ),
                   ],
