@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:http/http.dart' as http;
 
+import 'Modal.dart';
+
 class Popular extends StatefulWidget{
   @override
   State<StatefulWidget> createState() => PopularForm();
@@ -97,7 +99,7 @@ class PopularForm extends State<Popular>{
                       color: Color.fromARGB(255, 23, 162, 184),
                       icon: Icons.open_in_new,
                       onTap: () => {
-                        
+                        Modal.showModal(this.context,movies,index)
                       },
                     ),
                   ],
