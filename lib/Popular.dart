@@ -10,6 +10,7 @@ class Popular extends StatefulWidget{
 
 class PopularForm extends State<Popular>{
   final String urlPopular="https://api.themoviedb.org/3/movie/popular?api_key=323f74918f363cfd35a67d3ea4a5316d&language=es-MX&page=1";
+  final String urlAddFavorite="https://api.themoviedb.org/3/list/143905/add_item?api_key=323f74918f363cfd35a67d3ea4a5316d&session_id=0d0f33396cc0edd0999380e7ea3df066a039866a";
   var isLoading=false;
   List movies;
   
@@ -36,6 +37,22 @@ class PopularForm extends State<Popular>{
     }
     return "Accept";
   }
+  Future<String> addFavorite(int id) async{
+    String bodyJSON='{ "media_id" : $id }';
+    var response=await http.post(urlAddFavorite,
+      headers: {
+        "Content-Type": "application/json;charset=utf-8",
+      },
+      body: bodyJSON
+    );
+    print('Status code: ${response.statusCode}');
+    if(response.statusCode==201){
+      print('Se agrego exitosamente a Favortie');
+    }else{
+      print('No se pudo Agregar a Favorite');
+    }
+    return "Accept";
+  }
 
   @override
   void initState(){
@@ -50,7 +67,7 @@ class PopularForm extends State<Popular>{
       // ),
       body: isLoading ? Center(child: CircularProgressIndicator(),)
             : ListView.builder(
-              itemCount: movies==null ? 0 : 15,
+              itemCount: movies==null ? 0 : movies.length,
               itemBuilder: (BuildContext context, int index) {
                 return Slidable(
                   actionPane: SlidableDrawerActionPane(),
@@ -89,7 +106,7 @@ class PopularForm extends State<Popular>{
                       color: Color.fromARGB(255, 189, 100, 10),
                       icon: Icons.star,
                       onTap: () => {
-                        
+                        addFavorite(movies[index]['id'])
                       },
                     ),
                     IconSlideAction(

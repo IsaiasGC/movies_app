@@ -1,4 +1,7 @@
+import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:http/http.dart' as http;
 
 class Search extends StatefulWidget{
   const Search({Key key}) : super(key: key);
@@ -8,17 +11,15 @@ class Search extends StatefulWidget{
 }
 
 class SearchForm extends State<Search>{
-  final List<String> kEnglishWords;
-   _MySearchDelegate _delegate;
-
-  SearchForm()
-      : kEnglishWords = List.from(Set.from(['Hello', 'Bye', 'What', 'You']));
-      
+  List movies;
+  _MySearchDelegate _delegate;
   
+
+
   @override
   void initState() {
     super.initState();
-    _delegate = _MySearchDelegate(kEnglishWords);
+    _delegate = _MySearchDelegate(movies);
   }
 
   @override
@@ -48,7 +49,7 @@ class SearchForm extends State<Search>{
           ),
         ],
       ),
-      body: Center(child: Icon(Icons.network_check, size: 64.0, color: Colors.redAccent)),
+      body: Center(),
     );
   }
 }
@@ -59,12 +60,30 @@ class SearchForm extends State<Search>{
 class _MySearchDelegate extends SearchDelegate<String> {
   final List<String> _words;
   final List<String> _history;
+  var isLoading=false;
+  List movies;
+  final String urlAddFavorite="https://api.themoviedb.org/3/list/143905/add_item?api_key=323f74918f363cfd35a67d3ea4a5316d&session_id=0d0f33396cc0edd0999380e7ea3df066a039866a";
 
   _MySearchDelegate(List<String> words)
       : _words = words,
         _history = <String>['apple', 'hello', 'world', 'flutter'],
         super();
 
+  Future<String> searchMovie(String query) async{
+    query.replaceAll(' ', '%');
+    var response=await http.get('https://api.themoviedb.org/3/search/movie?api_key=323f74918f363cfd35a67d3ea4a5316d&language=es-MX&query=$query&page=1&include_adult=false',
+      headers: {
+        "Content-Type": "application/json;charset=utf-8",
+      }
+    );
+    print('Status code: ${response.statusCode}');
+    if(response.statusCode==201){
+      print('Se agrego exitosamente a Favortie');
+    }else{
+      print('No se pudo Agregar a Favorite');
+    }
+    return "Accept";
+  }
   // Leading icon in search bar.
   @override
   Widget buildLeading(BuildContext context) {
@@ -90,19 +109,53 @@ class _MySearchDelegate extends SearchDelegate<String> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Text('You have selected the word:'),
+            Text('Search Results:'),
             GestureDetector(
               onTap: () {
                 // Returns this.query as result to previous screen, c.f.
                 // showSearch() above.
+                searchMovie(this.query);
                 this.close(context, this.query);
               },
-              child: Text(
-                this.query,
-                style: Theme.of(context)
-                    .textTheme
-                    .display1
-                    .copyWith(fontWeight: FontWeight.bold),
+              child: ListView.builder(
+                      itemCount: movies==null ? 0 : movies.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Slidable(
+                          actionPane: SlidableDrawerActionPane(),
+                          actionExtentRatio: 0.25,
+                          child: Card(
+                            elevation: 8.0,
+                            margin: EdgeInsets.symmetric(horizontal: 5.0, vertical: 2.5),
+                            child: Container(
+                                  // decoration: BoxDecoration(color: Color.fromRGBO(50, 180, 237, .8)),
+                                  child: ListTile(
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 2.5),
+                                    leading: Container(
+                                      padding: EdgeInsets.only(right: 5.0),
+                                      // decoration: BoxDecoration(
+                                      //   border: Border( right: BorderSide(width: 1.0, color: Colors.black))
+                                      // ),
+                                      child: Image.network("https://image.tmdb.org/t/p/w500"+movies[index]['backdrop_path'],),
+                                    ),
+                                    title: Text(
+                                      movies[index]['title'],
+                                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                    ),
+                                    subtitle: Row(
+                                      children: <Widget>[
+                                        //Icon(Icons.touch_app, color: Colors.yellowAccent),
+                                        Text(movies[index]['release_date'], style: TextStyle(color: Colors.black))
+                                      ],
+                                    ),
+                                    // trailing: Icon(Icons.keyboard_arrow_right, color: Colors.black, size: 30.0,),
+                                    onTap: (){
+                                      this.query=movies[index]['id'];
+                                    },
+                                  ),
+                                ),
+                          ),
+                        );
+                      },
               ),
             ),
           ],

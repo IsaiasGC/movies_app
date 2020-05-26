@@ -12,7 +12,8 @@ class Favorite extends StatefulWidget{
 }
 
 class FavoriteForm extends State<Favorite>{
-  final String urlFavorite="https://api.themoviedb.org/3/movie/popular?api_key=323f74918f363cfd35a67d3ea4a5316d&language=es-MX&page=1";
+  final String urlFavorite="https://api.themoviedb.org/3/list/143905?api_key=323f74918f363cfd35a67d3ea4a5316d&language=es-MX";
+  final String urlDeleteItem="https://api.themoviedb.org/3/list/143905/remove_item?api_key=323f74918f363cfd35a67d3ea4a5316d&session_id=0d0f33396cc0edd0999380e7ea3df066a039866a";
   var isLoading=false;
   List movies;
   
@@ -29,13 +30,29 @@ class FavoriteForm extends State<Favorite>{
     if(response.statusCode==200){
       this.setState((){
         isLoading=false;
-        movies=convert.jsonDecode(response.body)['results'];
+        movies=convert.jsonDecode(response.body)['items'];
       });
     }else{
       movies=new List();
       this.setState((){
         isLoading=false;
       });
+    }
+    return "Accept";
+  }
+  Future<String> removeItem(int id) async{
+    String bodyJSON='{ "media_id" : $id }';
+    var response=await http.post(urlDeleteItem,
+      headers: {
+        "Content-Type": "application/json;charset=utf-8",
+      },
+      body: bodyJSON
+    );
+    print('Status code: ${response.statusCode}');
+    if(response.statusCode==200){
+      getFavorite();
+    }else{
+      print('No se pudo Eliminar');
     }
     return "Accept";
   }
@@ -47,10 +64,10 @@ class FavoriteForm extends State<Favorite>{
   @override
   Widget build(BuildContext context){
     return Scaffold(
-      appBar: AppBar(title: Text('Favorite'),),
+      // appBar: AppBar(title: Text('Favorite'),),
       body: isLoading ? Center(child: CircularProgressIndicator(),)
             : ListView.builder(
-              itemCount: movies==null ? 0 : 15,
+              itemCount: movies==null ? 0 : movies.length,
               itemBuilder: (BuildContext context, int index) {
                 return Slidable(
                   actionPane: SlidableDrawerActionPane(),
@@ -70,13 +87,13 @@ class FavoriteForm extends State<Favorite>{
                               child: Image.network("https://image.tmdb.org/t/p/w500"+movies[index]['backdrop_path'],),
                             ),
                             title: Text(
-                              movies[index]['title'],
+                              movies[index]['name']!=null ? movies[index]['name'] : movies[index]['title'],
                               style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                             ),
                             subtitle: Row(
                               children: <Widget>[
                                 //Icon(Icons.touch_app, color: Colors.yellowAccent),
-                                Text(movies[index]['release_date'], style: TextStyle(color: Colors.black))
+                                Text(movies[index]['media_type'], style: TextStyle(color: Colors.black))
                               ],
                             ),
                             // trailing: Icon(Icons.keyboard_arrow_right, color: Colors.black, size: 30.0,),
@@ -89,7 +106,7 @@ class FavoriteForm extends State<Favorite>{
                       color: Color.fromARGB(255, 189, 50, 10),
                       icon: Icons.star_border,
                       onTap: () => {
-                        
+                        removeItem(movies[index]['id'])
                       },
                     ),
                     IconSlideAction(
