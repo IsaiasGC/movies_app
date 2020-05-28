@@ -2,23 +2,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ViewDetails extends StatefulWidget{
-  List movies;
-  int index;
-  ViewDetails(this.movies, this.index);
+  Map<String, dynamic> movie;
+  ViewDetails(this.movie);
   @override
-  State<StatefulWidget> createState() => ViewDetailsForm(movies,index);
+  State<StatefulWidget> createState() => ViewDetailsForm(movie);
 
 }
 class ViewDetailsForm extends State<ViewDetails>{
-  List movies;
-  int index;
-  ViewDetailsForm(this.movies, this.index);
+  Map<String, dynamic> movie;
+  ViewDetailsForm(this.movie);
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
        appBar: AppBar(
-         title: Text(movies[index]['title']),
+         title: Text(movie['title']),
        ),
         body: Container(
           height: MediaQuery.of(context).size.height-250,
@@ -40,13 +38,13 @@ class ViewDetailsForm extends State<ViewDetails>{
 
               Container(
                 padding: EdgeInsets.all(6.0),
-                child: Image.network("https://image.tmdb.org/t/p/w500"+movies[index]['backdrop_path'],),
+                child: Image.network("https://image.tmdb.org/t/p/w500"+movie['backdrop_path'],),
 
               ),
               Container(
                 padding: EdgeInsets.all(6.0),
                 child: Text(
-                  movies[index]['overview'],
+                  movie['overview'],
                   textAlign: TextAlign.justify,
                 ),
 
@@ -55,7 +53,7 @@ class ViewDetailsForm extends State<ViewDetails>{
                 padding: EdgeInsets.all(6.0),
                 child: Text(
                   "Fecha de estreno "+
-                      movies[index]['release_date'],
+                      movie['release_date'],
                   textAlign: TextAlign.justify,
                 ),
 

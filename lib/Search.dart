@@ -1,8 +1,36 @@
 import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:movies_app/ViewDetails.dart';
 
 class Search extends StatelessWidget{
+
+  Future<String> viewMovie(String id, context) async{
+    var url='https://api.themoviedb.org/3/movie/$id?api_key=323f74918f363cfd35a67d3ea4a5316d&language=es-MX';
+    Map<String, dynamic> movie;
+    var response=await http.get(url,
+      headers: {
+        "Accept": "application/json",
+      }
+    );
+    print('Status code: ${response.statusCode}');
+    if(response.statusCode==200){
+        movie=convert.jsonDecode(response.body);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ViewDetails(movie),
+          ),
+        );
+    }else{
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Osurrio unerror: no se pudo cargar la pelicula'),
+        ),
+      );
+    }
+    return "Accept";
+  }
   
   @override
   Widget build(BuildContext context){
@@ -18,11 +46,7 @@ class Search extends StatelessWidget{
                 delegate: DataSearch()
               );
               if (selected != null) {
-                Scaffold.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('You have selected the movie: $selected'),
-                  ),
-                );
+                viewMovie(selected, context);
               }
           })
         ],

@@ -39,8 +39,8 @@ class PopularForm extends State<Popular>{
     }
     return "Accept";
   }
-  Future<String> addFavorite(int id) async{
-    String bodyJSON='{ "media_id" : $id }';
+  Future<String> addFavorite(int index) async{
+    String bodyJSON='{ "media_id" : ${movies[index]['id']} }';
     var response=await http.post(urlAddFavorite,
       headers: {
         "Content-Type": "application/json;charset=utf-8",
@@ -49,9 +49,19 @@ class PopularForm extends State<Popular>{
     );
     print('Status code: ${response.statusCode}');
     if(response.statusCode==201){
-      print('Se agrego exitosamente a Favortie');
+      // print('Se agrego exitosamente a Favortie');
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${movies[index]['title']} Se añadio a Favortie'),
+        ),
+      );
     }else{
-      print('No se pudo Agregar a Favorite');
+      // print('No se pudo Agregar a Favorite');
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No se pudo Agregar a Favorite ${movies[index]['title']}'),
+        ),
+      );
     }
     return "Accept";
   }
@@ -108,7 +118,7 @@ class PopularForm extends State<Popular>{
                       color: Color.fromARGB(255, 189, 100, 10),
                       icon: Icons.star,
                       onTap: () => {
-                        addFavorite(movies[index]['id'])
+                        addFavorite(index)
                       },
                     ),
                     IconSlideAction(
@@ -116,12 +126,12 @@ class PopularForm extends State<Popular>{
                       color: Color.fromARGB(255, 23, 162, 184),
                       icon: Icons.open_in_new,
                       onTap: () => {
-                      Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                      builder: (context) => ViewDetails(movies,index),
-                        ),
-                      )
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ViewDetails(movies[index]),
+                          ),
+                        )
                       },
                     ),
                   ],

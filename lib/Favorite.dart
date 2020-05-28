@@ -2,6 +2,7 @@ import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:http/http.dart' as http;
+import 'package:movies_app/ViewDetails.dart';
 
 
 class Favorite extends StatefulWidget{
@@ -40,8 +41,8 @@ class FavoriteForm extends State<Favorite>{
     }
     return "Accept";
   }
-  Future<String> removeItem(int id) async{
-    String bodyJSON='{ "media_id" : $id }';
+  Future<String> removeItem(int index) async{
+    String bodyJSON='{ "media_id" : ${movies[index]['id']} }';
     var response=await http.post(urlDeleteItem,
       headers: {
         "Content-Type": "application/json;charset=utf-8",
@@ -50,9 +51,19 @@ class FavoriteForm extends State<Favorite>{
     );
     print('Status code: ${response.statusCode}');
     if(response.statusCode==200){
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${movies[index]['title']} Se Elimino de Favortie'),
+        ),
+      );
       getFavorite();
     }else{
       print('No se pudo Eliminar');
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No se pudo Eliminar de Favorite ${movies[index]['title']}'),
+        ),
+      );
     }
     return "Accept";
   }
@@ -106,7 +117,7 @@ class FavoriteForm extends State<Favorite>{
                       color: Color.fromARGB(255, 189, 50, 10),
                       icon: Icons.star_border,
                       onTap: () => {
-                        removeItem(movies[index]['id'])
+                        removeItem(index)
                       },
                     ),
                     IconSlideAction(
@@ -114,7 +125,12 @@ class FavoriteForm extends State<Favorite>{
                       color: Color.fromARGB(255, 23, 162, 184),
                       icon: Icons.open_in_new,
                       onTap: () => {
-                        
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ViewDetails(movies[index]),
+                          ),
+                        )
                       },
                     ),
                   ],
