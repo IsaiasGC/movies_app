@@ -1,55 +1,32 @@
 import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:http/http.dart' as http;
 
-class Search extends StatefulWidget{
-  const Search({Key key}) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => SearchForm();
-}
-
-class SearchForm extends State<Search>{
-  List movies;
-  _MySearchDelegate _delegate;
+class Search extends StatelessWidget{
   
-
-
-  @override
-  void initState() {
-    super.initState();
-    _delegate = _MySearchDelegate(movies);
-  }
-
   @override
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        brightness: Brightness.dark,
-        automaticallyImplyLeading: false,
-        title: Text('Search Movies'),
+        title: Text('Search Movie'),
         actions: <Widget>[
           IconButton(
-            tooltip: 'Search',
-            icon: const Icon(Icons.search),
+            icon: Icon(Icons.search), 
             onPressed: () async {
               final String selected = await showSearch<String>(
-                context: context,
-                delegate: _delegate,
+                context: context, 
+                delegate: DataSearch()
               );
               if (selected != null) {
                 Scaffold.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('You have selected the word: $selected'),
+                    content: Text('You have selected the movie: $selected'),
                   ),
                 );
               }
-            },
-          ),
+          })
         ],
       ),
-      body: Center(),
     );
   }
 }
@@ -57,36 +34,48 @@ class SearchForm extends State<Search>{
 
 // Defines the content of the search page in showSearch().
 // SearchDelegate has a member query which is the query string.
-class _MySearchDelegate extends SearchDelegate<String> {
-  final List<String> _words;
-  final List<String> _history;
-  var isLoading=false;
+class DataSearch extends SearchDelegate<String> {
+  final List history;
   List movies;
-  final String urlAddFavorite="https://api.themoviedb.org/3/list/143905/add_item?api_key=323f74918f363cfd35a67d3ea4a5316d&session_id=0d0f33396cc0edd0999380e7ea3df066a039866a";
+  BuildContext context;
 
-  _MySearchDelegate(List<String> words)
-      : _words = words,
-        _history = <String>['apple', 'hello', 'world', 'flutter'],
+  DataSearch()
+      : history = <String>['apple', 'hello', 'world', 'flutter'],//obtener historial
         super();
-
+  
   Future<String> searchMovie(String query) async{
+    movies=new List();
     query.replaceAll(' ', '%');
     var response=await http.get('https://api.themoviedb.org/3/search/movie?api_key=323f74918f363cfd35a67d3ea4a5316d&language=es-MX&query=$query&page=1&include_adult=false',
       headers: {
-        "Content-Type": "application/json;charset=utf-8",
+        "Accept": "application/json",
       }
     );
     print('Status code: ${response.statusCode}');
-    if(response.statusCode==201){
-      print('Se agrego exitosamente a Favortie');
+    if(response.statusCode==200){
+      movies=convert.jsonDecode(response.body)['results'];
     }else{
-      print('No se pudo Agregar a Favorite');
+      print('No se encontraron similitudes');
     }
-    return "Accept";
+    return 'Accept';
+  }
+  
+  @override
+  ThemeData appBarTheme(BuildContext context) {
+    assert(context != null);
+    final ThemeData theme = Theme.of(context);
+    assert(theme != null);
+    return theme.copyWith(
+      primaryColor: Colors.white,
+      primaryIconTheme: theme.primaryIconTheme.copyWith(color: Colors.grey),
+      primaryColorBrightness: Brightness.light,
+      primaryTextTheme: theme.textTheme,
+    );
   }
   // Leading icon in search bar.
   @override
   Widget buildLeading(BuildContext context) {
+    this.context=context;
     return IconButton(
       tooltip: 'Back',
       icon: AnimatedIcon(
@@ -103,63 +92,23 @@ class _MySearchDelegate extends SearchDelegate<String> {
   // Widget of result page.
   @override
   Widget buildResults(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Text('Search Results:'),
-            GestureDetector(
-              onTap: () {
-                // Returns this.query as result to previous screen, c.f.
-                // showSearch() above.
-                searchMovie(this.query);
-                this.close(context, this.query);
-              },
-              child: ListView.builder(
-                      itemCount: movies==null ? 0 : movies.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Slidable(
-                          actionPane: SlidableDrawerActionPane(),
-                          actionExtentRatio: 0.25,
-                          child: Card(
-                            elevation: 8.0,
-                            margin: EdgeInsets.symmetric(horizontal: 5.0, vertical: 2.5),
-                            child: Container(
-                                  // decoration: BoxDecoration(color: Color.fromRGBO(50, 180, 237, .8)),
-                                  child: ListTile(
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 2.5),
-                                    leading: Container(
-                                      padding: EdgeInsets.only(right: 5.0),
-                                      // decoration: BoxDecoration(
-                                      //   border: Border( right: BorderSide(width: 1.0, color: Colors.black))
-                                      // ),
-                                      child: Image.network("https://image.tmdb.org/t/p/w500"+movies[index]['backdrop_path'],),
-                                    ),
-                                    title: Text(
-                                      movies[index]['title'],
-                                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                                    ),
-                                    subtitle: Row(
-                                      children: <Widget>[
-                                        //Icon(Icons.touch_app, color: Colors.yellowAccent),
-                                        Text(movies[index]['release_date'], style: TextStyle(color: Colors.black))
-                                      ],
-                                    ),
-                                    // trailing: Icon(Icons.keyboard_arrow_right, color: Colors.black, size: 30.0,),
-                                    onTap: (){
-                                      this.query=movies[index]['id'];
-                                    },
-                                  ),
-                                ),
-                          ),
-                        );
-                      },
-              ),
-            ),
-          ],
+    return ListView.builder(
+      itemCount: movies==null? 0: movies.length,
+      itemBuilder: (context, index) => ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 2.5),
+        leading: Container(
+          padding: movies[index]['backdrop_path']!=null ? EdgeInsets.only(right: 5.0) : EdgeInsets.symmetric(horizontal: 27.0),
+          child: movies[index]['backdrop_path']!=null ? Image.network("https://image.tmdb.org/t/p/w500"+movies[index]['backdrop_path'],)
+                        : Icon(Icons.photo, size: 50.00,),
         ),
+        title: Text(
+          movies[index]['title'],
+          style: TextStyle(color: Colors.black),
+        ),
+        onTap: (){
+          this.query='${movies[index]['id']}';
+          this.close(context, this.query);
+        },
       ),
     );
   }
@@ -167,18 +116,30 @@ class _MySearchDelegate extends SearchDelegate<String> {
   // Suggestions list while typing (this.query).
   @override
   Widget buildSuggestions(BuildContext context) {
-    final Iterable<String> suggestions = this.query.isEmpty
-        ? _history
-        : _words.where((word) => word.startsWith(query));
-
-    return _SuggestionList(
-      query: this.query,
-      suggestions: suggestions.toList(),
-      onSelected: (String suggestion) {
-        this.query = suggestion;
-        this._history.insert(0, suggestion);
-        showResults(context);
-      },
+    final List suggestionList=history;
+    // final bool search=this.query.isNotEmpty;
+    return ListView.builder(
+      itemCount: suggestionList.length,
+      itemBuilder: (context, index) => ListTile(
+        leading: query.isEmpty ? Icon(Icons.history) : Icon(null),
+        title: RichText(
+            text: TextSpan(
+              text: suggestionList[index].substring(0, query.length),
+              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+              children: <TextSpan>[
+                TextSpan(
+                  text: suggestionList[index].substring(query.length),
+                  style: TextStyle(color: Colors.grey)
+                ),
+              ],
+            ),
+        ),
+        onTap: (){
+          this.query= suggestionList[index];
+          searchMovie(this.query).then((value) => this.showResults(this.context));
+          // this.close(context, this.query);
+        },
+      ),
     );
   }
 
@@ -191,7 +152,7 @@ class _MySearchDelegate extends SearchDelegate<String> {
               tooltip: 'Voice Search',
               icon: const Icon(Icons.mic),
               onPressed: () {
-                this.query = 'TODO: implement voice input';
+                // this.query = 'TODO: implement voice input';
               },
             )
           : IconButton(
@@ -203,43 +164,5 @@ class _MySearchDelegate extends SearchDelegate<String> {
               },
             )
     ];
-  }
-}
-// Suggestions list widget displayed in the search page.
-class _SuggestionList extends StatelessWidget {
-  const _SuggestionList({this.suggestions, this.query, this.onSelected});
-
-  final List<String> suggestions;
-  final String query;
-  final ValueChanged<String> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme.subhead;
-    return ListView.builder(
-      itemCount: suggestions.length,
-      itemBuilder: (BuildContext context, int i) {
-        final String suggestion = suggestions[i];
-        return ListTile(
-          leading: query.isEmpty ? Icon(Icons.history) : Icon(null),
-          // Highlight the substring that matched the query.
-          title: RichText(
-            text: TextSpan(
-              text: suggestion.substring(0, query.length),
-              style: textTheme.copyWith(fontWeight: FontWeight.bold),
-              children: <TextSpan>[
-                TextSpan(
-                  text: suggestion.substring(query.length),
-                  style: textTheme,
-                ),
-              ],
-            ),
-          ),
-          onTap: () {
-            onSelected(suggestion);
-          },
-        );
-      },
-    );
   }
 }
