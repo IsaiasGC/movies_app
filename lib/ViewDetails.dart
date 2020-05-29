@@ -1,18 +1,67 @@
+import 'dart:developer';
+
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ViewDetails extends StatefulWidget{
   List movies;
   int index;
-  ViewDetails(this.movies, this.index);
+  ViewDetails(this.movies);
   @override
-  State<StatefulWidget> createState() => ViewDetailsForm(movies,index);
+  State<StatefulWidget> createState() => ViewDetailsForm(movies);
 
 }
 class ViewDetailsForm extends State<ViewDetails>{
   List movies;
   int index;
-  ViewDetailsForm(this.movies, this.index);
+  ViewDetailsForm(this.movies);
+  List casting;
+  String parsedCastign = "";
+  var isLoading=false;
+
+  Future<String> getCast() async{
+    int id = this.movies[this.index]['id'];
+    String urlCredits = "https://api.themoviedb.org/3/movie/$id/credits?api_key=323f74918f363cfd35a67d3ea4a5316d";
+    log(urlCredits);
+    this.setState((){
+      isLoading=true;
+    });
+    var response=await http.get(urlCredits,
+        headers: {
+          "Accept": "application/json",
+        }
+    );
+    print('Status codeeee: ${response.statusCode}');
+    if(response.statusCode==200){
+      this.setState((){
+        isLoading=false;
+        casting = convert.jsonDecode(response.body)['cast'];
+      });
+    }else{
+      casting = new List();
+      this.setState((){
+        isLoading=false;
+      });
+    }
+    return "Accept";
+  }
+
+  String getParsedListCasting(){
+    String parsedCasting = "No casting";
+//    if (casting != null)
+    for(var i=0; i<1; i++){
+      log("$casting['cast_id']");
+    }
+//    else log(parsedCasting);
+    return 'nil';
+  }
+  @override
+  void initState(){
+    getCast();
+    getParsedListCasting();
+  }
   @override
   Widget build(BuildContext context) {
     // TODO: implement build

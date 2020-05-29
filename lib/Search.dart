@@ -19,7 +19,7 @@ class Search extends StatelessWidget{
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ViewDetails(movie),
+//            builder: (context) => ViewDetails(movie),
           ),
         );
     }else{
