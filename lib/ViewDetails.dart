@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ViewDetails extends StatefulWidget{
-  List movies;
+  Map<String,dynamic> movies;
   int index;
   ViewDetails(this.movies);
   @override
@@ -14,7 +14,7 @@ class ViewDetails extends StatefulWidget{
 
 }
 class ViewDetailsForm extends State<ViewDetails>{
-  List movies;
+  Map<String,dynamic> movies;
   int index;
   ViewDetailsForm(this.movies);
   List casting;
@@ -22,7 +22,7 @@ class ViewDetailsForm extends State<ViewDetails>{
   var isLoading=false;
 
   Future<String> getCast() async{
-    int id = this.movies[this.index]['id'];
+    int id = this.movies['id'];
     String urlCredits = "https://api.themoviedb.org/3/movie/$id/credits?api_key=323f74918f363cfd35a67d3ea4a5316d";
     log(urlCredits);
     this.setState((){
@@ -45,29 +45,34 @@ class ViewDetailsForm extends State<ViewDetails>{
         isLoading=false;
       });
     }
+    parsedCastign = getParsedListCasting();
     return "Accept";
   }
 
   String getParsedListCasting(){
     String parsedCasting = "No casting";
-//    if (casting != null)
-    for(var i=0; i<1; i++){
-      log("$casting['cast_id']");
-    }
+    String prueba = "";
+    if (casting != null)
+      for(var i = 0; i<4; i++){
+        if (i==3)
+          prueba = prueba + casting[i]['name'];
+        else { prueba = casting[i]['name'] +", "+ prueba; }
+      }
+    else { prueba = parsedCasting; }
+    parsedCasting = prueba;
 //    else log(parsedCasting);
-    return 'nil';
+    return parsedCasting;
   }
   @override
   void initState(){
     getCast();
-    getParsedListCasting();
   }
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
        appBar: AppBar(
-         title: Text(movies[index]['title']),
+         title: Text(movies['title']),
        ),
         body: Container(
           height: MediaQuery.of(context).size.height-250,
@@ -89,13 +94,13 @@ class ViewDetailsForm extends State<ViewDetails>{
 
               Container(
                 padding: EdgeInsets.all(6.0),
-                child: Image.network("https://image.tmdb.org/t/p/w500"+movies[index]['backdrop_path'],),
+                child: Image.network("https://image.tmdb.org/t/p/w500"+movies['backdrop_path'],),
 
               ),
               Container(
                 padding: EdgeInsets.all(6.0),
                 child: Text(
-                  movies[index]['overview'],
+                  movies['overview'],
                   textAlign: TextAlign.justify,
                 ),
 
@@ -104,7 +109,16 @@ class ViewDetailsForm extends State<ViewDetails>{
                 padding: EdgeInsets.all(6.0),
                 child: Text(
                   "Fecha de estreno "+
-                      movies[index]['release_date'],
+                      movies['release_date'],
+                  textAlign: TextAlign.justify,
+                ),
+
+              ),
+              Container(
+                padding: EdgeInsets.all(6.0),
+                child: Text(
+                  "Cast: "+
+                      parsedCastign,
                   textAlign: TextAlign.justify,
                 ),
 
