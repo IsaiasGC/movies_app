@@ -100,12 +100,12 @@ class PopularForm extends State<Popular>{
                             ),
                             title: Text(
                               movies[index]['title'],
-                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                              style: Theme.of(context).textTheme.bodyText1,
                             ),
                             subtitle: Row(
                               children: <Widget>[
                                 //Icon(Icons.touch_app, color: Colors.yellowAccent),
-                                Text(movies[index]['release_date'], style: TextStyle(color: Colors.black))
+                                Text(movies[index]['release_date'], style: Theme.of(context).textTheme.bodyText2)
                               ],
                             ),
                             // trailing: Icon(Icons.keyboard_arrow_right, color: Colors.black, size: 30.0,),
@@ -116,7 +116,7 @@ class PopularForm extends State<Popular>{
                     IconSlideAction(
                       caption: 'add to favorite',
                       color: Color.fromARGB(255, 189, 100, 10),
-                      icon: Icons.star,
+                      icon: Icons.favorite,
                       onTap: () => {
                         addFavorite(index)
                       },

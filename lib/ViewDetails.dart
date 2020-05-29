@@ -24,7 +24,7 @@ class ViewDetailsForm extends State<ViewDetails>{
   Future<String> getCast() async{
     int id = this.movies['id'];
     String urlCredits = "https://api.themoviedb.org/3/movie/$id/credits?api_key=323f74918f363cfd35a67d3ea4a5316d";
-    log(urlCredits);
+    // log(urlCredits);
     this.setState((){
       isLoading=true;
     });
@@ -33,7 +33,7 @@ class ViewDetailsForm extends State<ViewDetails>{
           "Accept": "application/json",
         }
     );
-    print('Status codeeee: ${response.statusCode}');
+    print('Status code: ${response.statusCode}');
     if(response.statusCode==200){
       this.setState((){
         isLoading=false;
@@ -69,13 +69,13 @@ class ViewDetailsForm extends State<ViewDetails>{
   }
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    
     return Scaffold(
        appBar: AppBar(
          title: Text(movies['title']),
        ),
         body: Container(
-          height: MediaQuery.of(context).size.height-250,
+          // height: MediaQuery.of(context).size.height-250,
           width: 400.0,
           child: Column(
             children: <Widget>[

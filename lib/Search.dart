@@ -19,7 +19,7 @@ class Search extends StatelessWidget{
         Navigator.push(
           context,
           MaterialPageRoute(
-//            builder: (context) => ViewDetails(movie),
+            builder: (context) => ViewDetails(movie),
           ),
         );
     }else{
@@ -84,18 +84,6 @@ class DataSearch extends SearchDelegate<String> {
     return 'Accept';
   }
   
-  @override
-  ThemeData appBarTheme(BuildContext context) {
-    assert(context != null);
-    final ThemeData theme = Theme.of(context);
-    assert(theme != null);
-    return theme.copyWith(
-      primaryColor: Colors.white,
-      primaryIconTheme: theme.primaryIconTheme.copyWith(color: Colors.grey),
-      primaryColorBrightness: Brightness.light,
-      primaryTextTheme: theme.textTheme,
-    );
-  }
   // Leading icon in search bar.
   @override
   Widget buildLeading(BuildContext context) {

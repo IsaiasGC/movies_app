@@ -16,19 +16,6 @@ class App extends StatelessWidget{
       //   '/search' : (context)=>Search(),
       //   '/favorite' : (context)=>Favorite(),
       // },
-      // theme: ThemeData(
-      //   primaryColor: Colors.black38,
-        // primaryTextTheme: TextTheme(
-        //   title: TextStyle(color: Colors.white),
-        // ),
-      //   accentColor: Colors.green,
-      //   backgroundColor: Colors.black,
-      //   bottomAppBarColor: Colors.black38,
-      //   textTheme: TextTheme(
-      //     body1: TextStyle(color: Colors.white),
-      //     body2: TextStyle(color: Colors.white),
-      //   ),
-      // ),
       title: 'Movies App',
       home: Splash(),
     );

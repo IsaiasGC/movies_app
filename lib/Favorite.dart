@@ -115,7 +115,7 @@ class FavoriteForm extends State<Favorite>{
                     IconSlideAction(
                       caption: 'quit of favorite',
                       color: Color.fromARGB(255, 189, 50, 10),
-                      icon: Icons.star_border,
+                      icon: Icons.favorite_border,
                       onTap: () => {
                         removeItem(index)
                       },
