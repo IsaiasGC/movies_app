@@ -22,19 +22,19 @@ class DashboardForm extends State<Dashboard>{
     final _kBottmonNavBarItems = <BottomNavigationBarItem>[
       BottomNavigationBarItem(icon: Icon(Icons.movie), title: Text('popular')),
       BottomNavigationBarItem(icon: Icon(Icons.search), title: Text('search')),
-      BottomNavigationBarItem(icon: Icon(Icons.star), title: Text('favorite')),
+      BottomNavigationBarItem(icon: Icon(Icons.favorite), title: Text('favorite')),
     ];
     assert(_kTabPages.length == _kBottmonNavBarItems.length);
     final bottomNavBar = BottomNavigationBar(
       items: _kBottmonNavBarItems,
       currentIndex: _currentTabIndex,
-      fixedColor: Colors.black26,
+      fixedColor: Colors.blueAccent[100],
       type: BottomNavigationBarType.fixed,
+      // backgroundColor: Theme.of(context).primaryColor,
       onTap: (int index) {
         setState(() {
           _currentTabIndex = index;
         });
-        // Navigator.pushReplacementNamed(context, '/route');
       },
     );
     return Scaffold(
