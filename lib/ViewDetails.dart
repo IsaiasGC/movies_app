@@ -57,6 +57,7 @@ class ViewDetailsForm extends State<ViewDetails>{
         if (i==3)
           prueba = prueba + casting[i]['name'];
         else { prueba = casting[i]['name'] +", "+ prueba; }
+
       }
     else { prueba = parsedCasting; }
     parsedCasting = prueba;
