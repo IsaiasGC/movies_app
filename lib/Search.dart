@@ -2,9 +2,10 @@ import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:movies_app/ViewDetails.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 
 class Search extends StatelessWidget{
-
+  bool internet=false;
   Future<String> viewMovie(String id, context) async{
     var url='https://api.themoviedb.org/3/movie/$id?api_key=323f74918f363cfd35a67d3ea4a5316d&language=es-MX';
     Map<String, dynamic> movie;
@@ -41,15 +42,66 @@ class Search extends StatelessWidget{
           IconButton(
             icon: Icon(Icons.search), 
             onPressed: () async {
-              final String selected = await showSearch<String>(
-                context: context, 
-                delegate: DataSearch()
-              );
-              if (selected != null) {
-                viewMovie(selected, context);
+              if(internet){
+                final String selected = await showSearch<String>(
+                  context: context, 
+                  delegate: DataSearch()
+                );
+                if (selected != null) {
+                  viewMovie(selected, context);
+                }
+              }else{
+                Scaffold.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('No puede buscar sin internet'),
+                  ),
+                );
               }
           })
         ],
+      ),
+      body: OfflineBuilder(
+        connectivityBuilder: (
+          BuildContext context,
+          ConnectivityResult connectivity,
+          Widget child,
+        ) {
+          final bool connected = connectivity != ConnectivityResult.none;
+          this.internet=connected;
+          return new Stack(
+            fit: StackFit.expand,
+            children: [
+              Positioned(
+                height: connected ? 0.0 : 25.0,
+                left: 0.0,
+                right: 0.0,
+                child: Container(
+                  color: Color(0xFFEE4400),
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: connected ? <Widget>[] 
+                      : <Widget>[
+                        Text("OFFLINE ", style: TextStyle(color: Colors.white70),),
+                        // CircularProgressIndicator()
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(connected ? Icons.movie_creation : Icons.not_interested, size: 80, color: Colors.grey[350]),
+                    Text("${connected ? 'Search a movie' : 'Not internet'}", style: TextStyle(color: Colors.grey[350])),
+                  ],
+                )
+              ),
+            ],
+          );
+        },
+        child: Text("data")
       ),
     );
   }
