@@ -59,12 +59,12 @@ class Search extends StatelessWidget{
 // Defines the content of the search page in showSearch().
 // SearchDelegate has a member query which is the query string.
 class DataSearch extends SearchDelegate<String> {
-  final List history;
+  final List<String> history;
   List movies;
   BuildContext context;
 
   DataSearch()
-      : history = <String>['apple', 'hello', 'world', 'flutter'],//obtener historial
+      : history = <String>['apple', 'hello', 'world', 'club'],//obtener historial
         super();
   
   Future<String> searchMovie(String query) async{
@@ -104,6 +104,20 @@ class DataSearch extends SearchDelegate<String> {
   // Widget of result page.
   @override
   Widget buildResults(BuildContext context) {
+    this.history.insert(0,this.query);
+    return Container(
+      child: FutureBuilder<String>(
+        future: searchMovie(this.query),
+        builder: (context, snapshot){
+          if(snapshot.connectionState==ConnectionState.done)
+            return getResultList();
+          else
+            return Center(child:CircularProgressIndicator());
+        },
+    ));
+  }
+
+  Widget getResultList(){
     return ListView.builder(
       itemCount: movies==null? 0: movies.length,
       itemBuilder: (context, index) => ListTile(
@@ -124,31 +138,20 @@ class DataSearch extends SearchDelegate<String> {
       ),
     );
   }
-
   // Suggestions list while typing (this.query).
   @override
   Widget buildSuggestions(BuildContext context) {
-    final List suggestionList=history;
+    final List suggestionList=history.where((element) => element.contains(this.query)).toList();
     // final bool search=this.query.isNotEmpty;
     return ListView.builder(
       itemCount: suggestionList.length,
       itemBuilder: (context, index) => ListTile(
         leading: query.isEmpty ? Icon(Icons.history) : Icon(null),
-        title: RichText(
-            text: TextSpan(
-              text: suggestionList[index].substring(0, query.length),
-              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-              children: <TextSpan>[
-                TextSpan(
-                  text: suggestionList[index].substring(query.length),
-                  style: TextStyle(color: Colors.grey)
-                ),
-              ],
-            ),
-        ),
+        title: Text(suggestionList[index]),
         onTap: (){
           this.query= suggestionList[index];
-          searchMovie(this.query).then((value) => this.showResults(this.context));
+          this.showResults(this.context);
+          // searchMovie(this.query).then((value) => this.showResults(this.context));
           // this.close(context, this.query);
         },
       ),
