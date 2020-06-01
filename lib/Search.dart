@@ -123,7 +123,7 @@ class DataSearch extends SearchDelegate<String> {
       itemBuilder: (context, index) => ListTile(
         contentPadding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 2.5),
         leading: Container(
-          padding: movies[index]['backdrop_path']!=null ? EdgeInsets.only(right: 5.0) : EdgeInsets.symmetric(horizontal: 27.0),
+          padding: EdgeInsets.only(right: 5.0),
           child: movies[index]['backdrop_path']!=null ? Image.network("https://image.tmdb.org/t/p/w500"+movies[index]['backdrop_path'],)
                         : Icon(Icons.photo, size: 50.00,),
         ),
