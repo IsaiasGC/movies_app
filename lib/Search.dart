@@ -93,8 +93,8 @@ class Search extends StatelessWidget{
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Icon(connected ? Icons.movie_creation : Icons.not_interested, size: 80, color: Colors.grey[350]),
-                    Text("${connected ? 'Search a movie' : 'Not internet'}", style: TextStyle(color: Colors.grey[350])),
+                    Icon(connected ? Icons.movie_creation : Icons.not_interested, size: 150, color: Colors.grey[700]),
+                    Text("${connected ? 'Search a movie' : 'Not internet'}", style: TextStyle(fontSize: 20, color: Colors.grey[700])),
                   ],
                 )
               ),
@@ -135,7 +135,20 @@ class DataSearch extends SearchDelegate<String> {
     }
     return 'Accept';
   }
-  
+
+  @override
+  ThemeData appBarTheme(BuildContext context) {
+    assert(context != null);
+    final ThemeData theme = Theme.of(context);
+    assert(theme != null);
+    return theme.copyWith(
+      primaryColor: Colors.black54,
+      primaryIconTheme: theme.primaryIconTheme.copyWith(color: Colors.grey),
+      primaryColorBrightness: Brightness.dark,
+      primaryTextTheme: theme.textTheme,
+    );
+  }
+
   // Leading icon in search bar.
   @override
   Widget buildLeading(BuildContext context) {
@@ -175,17 +188,23 @@ class DataSearch extends SearchDelegate<String> {
       itemBuilder: (context, index) => ListTile(
         contentPadding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 2.5),
         leading: Container(
-          padding: EdgeInsets.only(right: 5.0),
+          padding: movies[index]['backdrop_path']!=null ? EdgeInsets.only(right: 5.0) : EdgeInsets.symmetric(horizontal: 27.0),
           child: movies[index]['backdrop_path']!=null ? Image.network("https://image.tmdb.org/t/p/w500"+movies[index]['backdrop_path'],)
                         : Icon(Icons.photo, size: 50.00,),
         ),
         title: Text(
           movies[index]['title'],
-          style: TextStyle(color: Colors.black),
+          style: Theme.of(context).textTheme.bodyText1,
         ),
         onTap: (){
-          this.query='${movies[index]['id']}';
-          this.close(context, this.query);
+          // this.query='${movies[index]['id']}';
+          // this.close(context, this.query);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ViewDetails(movies[index]),
+            ),
+          );
         },
       ),
     );

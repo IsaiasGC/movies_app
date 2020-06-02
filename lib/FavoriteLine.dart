@@ -112,16 +112,18 @@ class FavoriteLineForm extends State<FavoriteLine>{
                 ),
                 actions: <Widget>[
                   IconSlideAction(
+                    foregroundColor: Colors.red,
                     caption: 'quit of favorite',
-                    color: Color.fromARGB(255, 189, 50, 10),
+                    color: Colors.grey[850],
                     icon: Icons.favorite_border,
                     onTap: () => {
                       removeItem(index)
                     },
                   ),
                   IconSlideAction(
+                    foregroundColor: Color.fromARGB(255, 23, 162, 184),
                     caption: 'view detail',
-                    color: Color.fromARGB(255, 23, 162, 184),
+                    color: Colors.grey[850],
                     icon: Icons.open_in_new,
                     onTap: () => {
                       Navigator.push(

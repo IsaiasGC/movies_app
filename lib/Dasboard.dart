@@ -30,7 +30,7 @@ class DashboardForm extends State<Dashboard>{
       currentIndex: _currentTabIndex,
       fixedColor: Colors.blueAccent[100],
       type: BottomNavigationBarType.fixed,
-      // backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: Theme.of(context).primaryColor,
       onTap: (int index) {
         setState(() {
           _currentTabIndex = index;

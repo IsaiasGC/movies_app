@@ -110,16 +110,18 @@ class PopularLineForm extends State<PopularLine>{
                   ),
                   actions: <Widget>[
                     IconSlideAction(
+                      foregroundColor: Colors.red,
                       caption: 'add to favorite',
-                      color: Color.fromARGB(255, 189, 100, 10),
+                      color: Colors.grey[850],
                       icon: Icons.favorite,
                       onTap: () => {
                         addFavorite(index, context)
                       },
                     ),
                     IconSlideAction(
+                      foregroundColor: Color.fromARGB(255, 23, 162, 184),
                       caption: 'view detail',
-                      color: Color.fromARGB(255, 23, 162, 184),
+                      color: Colors.grey[850],
                       icon: Icons.open_in_new,
                       onTap: () => {
                         Navigator.push(
