@@ -1,8 +1,12 @@
 import 'dart:convert' as convert;
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:http/http.dart' as http;
 import 'package:movies_app/ViewDetails.dart';
+
+import 'DBProvider.dart';
+import 'MovieApiProvider.dart';
 
 
 class Popular extends StatefulWidget{
@@ -69,6 +73,52 @@ class PopularForm extends State<Popular>{
   @override
   void initState(){
     getPopulars();
+    _loadFromApi();
+  }
+  _loadFromApi() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    var apiProvider = MovieApiProvider();
+    await apiProvider.getAllMovies();
+
+    // wait for 2 seconds to simulate loading of data
+    await Future.delayed(const Duration(seconds: 2));
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+  _buildMoviesListView() {
+    return FutureBuilder(
+      future: DBProvider.db.getAllMovies(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (!snapshot.hasData) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          return ListView.separated(
+            separatorBuilder: (context, index) => Divider(
+              color: Colors.black12,
+            ),
+            itemCount: snapshot.data.length,
+            itemBuilder: (BuildContext context, int index) {
+              debugPrint('${snapshot.data[index].date}');
+              return ListTile(
+                leading: Text(
+                  "${index + 1}",
+                  style: TextStyle(fontSize: 20.0),
+                ),
+                title: Text(
+                    "Name: ${snapshot.data[index].title}  "),
+              );
+            },
+          );
+        }
+      },
+    );
   }
 
   @override
@@ -78,66 +128,67 @@ class PopularForm extends State<Popular>{
       //   title: Text("Popular"),
       // ),
       body: isLoading ? Center(child: CircularProgressIndicator(),)
-            : ListView.builder(
-              itemCount: movies==null ? 0 : movies.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Slidable(
-                  actionPane: SlidableDrawerActionPane(),
-                  actionExtentRatio: 0.25,
-                  child: Card(
-                    elevation: 8.0,
-                    margin: EdgeInsets.symmetric(horizontal: 5.0, vertical: 2.5),
-                    child: Container(
-                          // decoration: BoxDecoration(color: Color.fromRGBO(50, 180, 237, .8)),
-                          child: ListTile(
-                            contentPadding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 2.5),
-                            leading: Container(
-                              padding: EdgeInsets.only(right: 5.0),
-                              // decoration: BoxDecoration(
-                              //   border: Border( right: BorderSide(width: 1.0, color: Colors.black))
-                              // ),
-                              child: Image.network("https://image.tmdb.org/t/p/w500"+movies[index]['backdrop_path'],),
-                            ),
-                            title: Text(
-                              movies[index]['title'],
-                              style: Theme.of(context).textTheme.bodyText1,
-                            ),
-                            subtitle: Row(
-                              children: <Widget>[
-                                //Icon(Icons.touch_app, color: Colors.yellowAccent),
-                                Text(movies[index]['release_date'], style: Theme.of(context).textTheme.bodyText2)
-                              ],
-                            ),
-                            // trailing: Icon(Icons.keyboard_arrow_right, color: Colors.black, size: 30.0,),
-                          ),
-                        ),
-                  ),
-                  actions: <Widget>[
-                    IconSlideAction(
-                      caption: 'add to favorite',
-                      color: Color.fromARGB(255, 189, 100, 10),
-                      icon: Icons.favorite,
-                      onTap: () => {
-                        addFavorite(index)
-                      },
-                    ),
-                    IconSlideAction(
-                      caption: 'view detail',
-                      color: Color.fromARGB(255, 23, 162, 184),
-                      icon: Icons.open_in_new,
-                      onTap: () => {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ViewDetails(movies[index]),
-                          ),
-                        )
-                      },
-                    ),
-                  ],
-                );
-              },
-      ),
+            :_buildMoviesListView()
+//            : ListView.builder(
+//              itemCount: movies==null ? 0 : movies.length,
+//              itemBuilder: (BuildContext context, int index) {
+//                return Slidable(
+//                  actionPane: SlidableDrawerActionPane(),
+//                  actionExtentRatio: 0.25,
+//                  child: Card(
+//                    elevation: 8.0,
+//                    margin: EdgeInsets.symmetric(horizontal: 5.0, vertical: 2.5),
+//                    child: Container(
+//                          // decoration: BoxDecoration(color: Color.fromRGBO(50, 180, 237, .8)),
+//                          child: ListTile(
+//                            contentPadding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 2.5),
+//                            leading: Container(
+//                              padding: EdgeInsets.only(right: 5.0),
+//                              // decoration: BoxDecoration(
+//                              //   border: Border( right: BorderSide(width: 1.0, color: Colors.black))
+//                              // ),
+//                              child: Image.network("https://image.tmdb.org/t/p/w500"+movies[index]['backdrop_path'],),
+//                            ),
+//                            title: Text(
+//                              movies[index]['title'],
+//                              style: Theme.of(context).textTheme.bodyText1,
+//                            ),
+//                            subtitle: Row(
+//                              children: <Widget>[
+//                                //Icon(Icons.touch_app, color: Colors.yellowAccent),
+//                                Text(movies[index]['release_date'], style: Theme.of(context).textTheme.bodyText2)
+//                              ],
+//                            ),
+//                            // trailing: Icon(Icons.keyboard_arrow_right, color: Colors.black, size: 30.0,),
+//                          ),
+//                        ),
+//                  ),
+//                  actions: <Widget>[
+//                    IconSlideAction(
+//                      caption: 'add to favorite',
+//                      color: Color.fromARGB(255, 189, 100, 10),
+//                      icon: Icons.favorite,
+//                      onTap: () => {
+//                        addFavorite(index)
+//                      },
+//                    ),
+//                    IconSlideAction(
+//                      caption: 'view detail',
+//                      color: Color.fromARGB(255, 23, 162, 184),
+//                      icon: Icons.open_in_new,
+//                      onTap: () => {
+//                        Navigator.push(
+//                          context,
+//                          MaterialPageRoute(
+//                            builder: (context) => ViewDetails(movies[index]),
+//                          ),
+//                        )
+//                      },
+//                    ),
+//                  ],
+//                );
+//              },
+//      ),
     );
   }
 }
