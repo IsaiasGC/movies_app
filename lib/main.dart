@@ -9,13 +9,6 @@ class App extends StatelessWidget{
   @override
   Widget build(BuildContext context){
     return MaterialApp(
-      // routes: {
-      //   '/' : (context)=>Splash(),
-      //   '/dashboard' : (context)=>Dashboard(),
-      //   '/popular' : (context)=>Popular(),
-      //   '/search' : (context)=>Search(),
-      //   '/favorite' : (context)=>Favorite(),
-      // },
       theme: ThemeData(
         // Define the default brightness and colors.
         brightness: Brightness.dark,

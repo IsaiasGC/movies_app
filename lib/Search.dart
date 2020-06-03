@@ -6,6 +6,7 @@ import 'package:flutter_offline/flutter_offline.dart';
 
 class Search extends StatelessWidget{
   bool internet=false;
+  DataSearch delegate=new DataSearch();
   Future<String> viewMovie(String id, context) async{
     var url='https://api.themoviedb.org/3/movie/$id?api_key=323f74918f363cfd35a67d3ea4a5316d&language=es-MX';
     Map<String, dynamic> movie;
@@ -20,7 +21,7 @@ class Search extends StatelessWidget{
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ViewDetails(movie),
+            builder: (context) => ViewDetails(movie, internet),
           ),
         );
     }else{
@@ -45,7 +46,7 @@ class Search extends StatelessWidget{
               if(internet){
                 final String selected = await showSearch<String>(
                   context: context, 
-                  delegate: DataSearch()
+                  delegate: delegate
                 );
                 if (selected != null) {
                   viewMovie(selected, context);
@@ -68,6 +69,7 @@ class Search extends StatelessWidget{
         ) {
           final bool connected = connectivity != ConnectivityResult.none;
           this.internet=connected;
+          delegate.setInternet(internet);
           return new Stack(
             fit: StackFit.expand,
             children: [
@@ -114,11 +116,15 @@ class DataSearch extends SearchDelegate<String> {
   final List<String> history;
   List movies;
   BuildContext context;
+  bool internet=false;
 
   DataSearch()
-      : history = <String>['apple', 'hello', 'world', 'club'],//obtener historial
+      : history = <String>['iron', 'marvel', 'war', 'club'],//obtener historial
         super();
-  
+
+  setInternet(bool internet){
+    this.internet=internet;
+  }
   Future<String> searchMovie(String query) async{
     movies=new List();
     query.replaceAll(' ', '%');
@@ -190,7 +196,7 @@ class DataSearch extends SearchDelegate<String> {
         leading: Container(
           padding: movies[index]['backdrop_path']!=null ? EdgeInsets.only(right: 5.0) : EdgeInsets.symmetric(horizontal: 27.0),
           child: movies[index]['backdrop_path']!=null ? Image.network("https://image.tmdb.org/t/p/w500"+movies[index]['backdrop_path'],)
-                        : Icon(Icons.photo, size: 50.00,),
+                        : Icon(Icons.photo, size: 50.00, color: Theme.of(context).textTheme.bodyText1.color,),
         ),
         title: Text(
           movies[index]['title'],
@@ -202,7 +208,7 @@ class DataSearch extends SearchDelegate<String> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ViewDetails(movies[index]),
+              builder: (context) => ViewDetails(movies[index], this.internet),
             ),
           );
         },

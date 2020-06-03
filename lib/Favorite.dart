@@ -5,7 +5,7 @@ import 'package:movies_app/FavoriteOffline.dart';
 
 
 class Favorite extends StatelessWidget{
-  var isLoading=false;
+  bool hasInternet=false;
   List movies;
   
   @override
@@ -19,7 +19,9 @@ class Favorite extends StatelessWidget{
           Widget child,
         ) {
           final bool connected = connectivity != ConnectivityResult.none;
-         
+          if(connected){
+            hasInternet=connected;
+          }
           return Stack(
             fit: StackFit.expand,
             children: <Widget>[
@@ -42,7 +44,10 @@ class Favorite extends StatelessWidget{
                     ),
                   ),
                 ),
-                connected ? FavoriteLine() : FavoriteOffline()
+                Container(
+                  margin: EdgeInsets.only(top: connected ? 0 : 25),
+                  child: connected || hasInternet ? FavoriteLine(connected) : FavoriteOffline(),
+                ),
             ]
           );
         },child: Text("data")

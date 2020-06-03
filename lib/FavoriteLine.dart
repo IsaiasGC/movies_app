@@ -2,22 +2,28 @@ import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:http/http.dart' as http;
+import 'package:movies_app/ApiProvider.dart';
 import 'package:movies_app/ViewDetails.dart';
 
 
 class FavoriteLine extends StatefulWidget{
+  bool internet;
+  FavoriteLine(this.internet);
   @override
   State<StatefulWidget> createState(){
-    return FavoriteLineForm();
+    return FavoriteLineForm(internet);
   }
 }
 
 class FavoriteLineForm extends State<FavoriteLine>{
   final String urlFavorite="https://api.themoviedb.org/3/list/143905?api_key=323f74918f363cfd35a67d3ea4a5316d&language=es-MX";
   final String urlDeleteItem="https://api.themoviedb.org/3/list/143905/remove_item?api_key=323f74918f363cfd35a67d3ea4a5316d&session_id=0d0f33396cc0edd0999380e7ea3df066a039866a";
+  bool internet;
   var isLoading=false;
   List movies;
   
+  FavoriteLineForm(this.internet);
+
   Future<String> getFavorite() async{
     this.setState((){
       isLoading=true;
@@ -27,6 +33,9 @@ class FavoriteLineForm extends State<FavoriteLine>{
         "Accept": "application/json",
       }
     );
+    var apiProvider = ApiProvider();
+    await apiProvider.getAllFavorite();
+    
     print('Status code: ${response.statusCode}');
     if(response.statusCode==200){
       this.setState((){
@@ -71,6 +80,7 @@ class FavoriteLineForm extends State<FavoriteLine>{
   @override
   void initState(){
     getFavorite();
+    super.initState();
   }
 
   @override
@@ -90,11 +100,11 @@ class FavoriteLineForm extends State<FavoriteLine>{
                         child: ListTile(
                           contentPadding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 2.5),
                           leading: Container(
-                            padding: EdgeInsets.only(right: 5.0),
+                            padding: movies[index]['backdrop_path']!=null ? EdgeInsets.only(right: 5.0) : EdgeInsets.symmetric(horizontal: 27.0),
                             // decoration: BoxDecoration(
                             //   border: Border( right: BorderSide(width: 1.0, color: Colors.black))
                             // ),
-                            child: Image.network("https://image.tmdb.org/t/p/w500"+movies[index]['backdrop_path'],),
+                            child: movies[index]['backdrop_path']!=null ? Image.network("https://image.tmdb.org/t/p/w500"+movies[index]['backdrop_path'],) : Icon(Icons.photo, size: 50.00, color: Theme.of(context).textTheme.bodyText1.color,),
                           ),
                           title: Text(
                             movies[index]['name']!=null ? movies[index]['name'] : movies[index]['title'],
@@ -129,7 +139,7 @@ class FavoriteLineForm extends State<FavoriteLine>{
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ViewDetails(movies[index]),
+                          builder: (context) => ViewDetails(movies[index], internet),
                         ),
                       )
                     },

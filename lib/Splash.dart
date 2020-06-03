@@ -16,13 +16,13 @@ class SplashForm extends State<Splash>{
 
   @override
   Widget build(BuildContext context){
-    setState(() {
-      // isLoged();
-    });
+    // setState(() {
+    //   isLoged();
+    // });
     
     return SplashScreen(
       seconds: 4,
-      image: Image.network("https://icons-for-free.com/iconfiles/png/512/clapper+cut+director+making+movie+take+icon-1320195777589696004.png"),
+      image: Image.asset('images/movie_icon.png', height: 60,),// Image.network("https://icons-for-free.com/iconfiles/png/512/clapper+cut+director+making+movie+take+icon-1320195777589696004.png"),
       navigateAfterSeconds: Dashboard(),
       title: Text("Movies App", 
         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),

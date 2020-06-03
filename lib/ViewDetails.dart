@@ -7,15 +7,17 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class ViewDetails extends StatefulWidget{
   Map<String,dynamic> movie;
-  ViewDetails(this.movie);
+  bool internet;
+  ViewDetails(this.movie, this.internet);
   @override
-  State<StatefulWidget> createState() => ViewDetailsForm(movie);
+  State<StatefulWidget> createState() => ViewDetailsForm(movie, internet);
 
 }
 class ViewDetailsForm extends State<ViewDetails>{
   final String urlAddFavorite="https://api.themoviedb.org/3/list/143905/add_item?api_key=323f74918f363cfd35a67d3ea4a5316d&session_id=0d0f33396cc0edd0999380e7ea3df066a039866a";
   Map<String,dynamic> movie;
-  ViewDetailsForm(this.movie);
+  bool internet;
+  ViewDetailsForm(this.movie, this.internet);
   List casting;
   var isLoading=false;
 
@@ -26,66 +28,80 @@ class ViewDetailsForm extends State<ViewDetails>{
     this.setState((){
       isLoading=true;
     });
-    var response=await http.get(urlCredits,
-        headers: {
-          "Accept": "application/json",
-        }
-    );
-    print('Status code: ${response.statusCode}');
-    if(response.statusCode==200){
-      this.setState((){
-        casting = convert.jsonDecode(response.body)['cast'];
-        isLoading=false;
-      });
-    }else{
-      casting = new List();
-      this.setState((){
-        isLoading=false;
-      });
+    if(internet){
+      var response=await http.get(urlCredits,
+          headers: {
+            "Accept": "application/json",
+          }
+      );
+      print('Status code: ${response.statusCode}');
+      if(response.statusCode==200){
+        this.setState((){
+          casting = convert.jsonDecode(response.body)['cast'];
+          isLoading=false;
+        });
+      }else{
+        casting = new List();
+        this.setState((){
+          isLoading=false;
+        });
+      }
     }
     return "Accept";
   }
   Future<String> addFavorite(BuildContext context) async{
     String bodyJSON='{ "media_id" : ${movie['id']} }';
-    var response=await http.post(urlAddFavorite,
-      headers: {
-        "Content-Type": "application/json;charset=utf-8",
-      },
-      body: bodyJSON
-    );
-    print('Status code: ${response.statusCode}');
-    if(response.statusCode==201){
-      // print('Se agrego exitosamente a Favortie');
-      // Scaffold.of(context).showSnackBar(
-      //   SnackBar(
-      //     content: Text('${movie['title']} Se añadio a Favortie'),
-      //   ),
-      // );
-      Fluttertoast.showToast(
-        msg: "${movie['title']} Se añadio a Favortie",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.black54,
-        textColor: Colors.white70,
-        fontSize: 16.0
+    if(internet){
+      var response=await http.post(urlAddFavorite,
+        headers: {
+          "Content-Type": "application/json;charset=utf-8",
+        },
+        body: bodyJSON
       );
+      print('Status code: ${response.statusCode}');
+      if(response.statusCode==201){
+        // print('Se agrego exitosamente a Favortie');
+        // Scaffold.of(context).showSnackBar(
+        //   SnackBar(
+        //     content: Text('${movie['title']} Se añadio a Favortie'),
+        //   ),
+        // );
+        Fluttertoast.showToast(
+          msg: "${movie['title']} Se añadio a Favortie",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          // backgroundColor: Colors.black54,
+          // textColor: Colors.white70,
+          fontSize: 16.0
+        );
+      }else{
+        // print('No se pudo Agregar a Favorite');
+        // Scaffold.of(context).showSnackBar(
+        //   SnackBar(
+        //     content: Text('No se pudo Agregar a Favorite ${movie['title']}'),
+        //   ),
+        // );
+        Fluttertoast.showToast(
+          msg: "No se pudo Agregar a Favorite ${movie['title']}",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          // backgroundColor: Colors.black54,
+          // textColor: Colors.white70,
+          fontSize: 16.0
+        );
+      }
     }else{
-      // print('No se pudo Agregar a Favorite');
-      // Scaffold.of(context).showSnackBar(
-      //   SnackBar(
-      //     content: Text('No se pudo Agregar a Favorite ${movie['title']}'),
-      //   ),
-      // );
       Fluttertoast.showToast(
-        msg: "No se pudo Agregar a Favorite ${movie['title']}",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.black54,
-        textColor: Colors.white70,
-        fontSize: 16.0
-      );
+          msg: "No se pudo Agregar a Favorite ${movie['title']}",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          // backgroundColor: Colors.black54,
+          // textColor: Colors.white70,
+          fontSize: 16.0
+        );
     }
     return "Accept";
   }
@@ -118,7 +134,7 @@ class ViewDetailsForm extends State<ViewDetails>{
                           image: new DecorationImage(
                               fit: BoxFit.fill,
                               image: i['profile_path']!=null ? new NetworkImage("https://image.tmdb.org/t/p/w500/${i['profile_path']}")
-                                      : Icon(Icons.person)
+                                      : Image(image: null)
                           )
                       )),
                   new Text("${i['name']}",textScaleFactor: 1.0)
@@ -133,6 +149,7 @@ class ViewDetailsForm extends State<ViewDetails>{
   @override
   void initState(){
     getCast();
+    super.initState();
   }
   @override
   Widget build(BuildContext context) {

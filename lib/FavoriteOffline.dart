@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:movies_app/DBProvider.dart';
+import 'package:movies_app/Movie.dart';
 import 'package:movies_app/ViewDetails.dart';
 
 
@@ -12,83 +14,78 @@ class FavoriteOffline extends StatefulWidget{
 
 class FavoriteOfflineForm extends State<FavoriteOffline>{
   var isLoading=false;
-  List movies;
-  
-  Future<String> getFavorite() async{
-    this.setState((){
-      isLoading=true;
-    });
-    
-    return "Accept";
-  }
-
-  @override
-  void initState(){
-    getFavorite();
-  }
+  List<Movie> movies;
 
   @override
   Widget build(BuildContext context){
-    return isLoading ? Center(child: CircularProgressIndicator(),)
-          : ListView.builder(
-            itemCount: movies==null ? 0 : movies.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Slidable(
-                actionPane: SlidableDrawerActionPane(),
-                actionExtentRatio: 0.25,
-                child: Card(
-                  elevation: 8.0,
-                  margin: EdgeInsets.symmetric(horizontal: 5.0, vertical: 2.5),
-                  child: Container(
-                        // decoration: BoxDecoration(color: Color.fromRGBO(50, 180, 237, .8)),
-                        child: ListTile(
-                          contentPadding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 2.5),
-                          leading: Container(
-                            padding: EdgeInsets.only(right: 5.0),
-                            // decoration: BoxDecoration(
-                            //   border: Border( right: BorderSide(width: 1.0, color: Colors.black))
-                            // ),
-                            child: Image.network("https://image.tmdb.org/t/p/w500"+movies[index]['backdrop_path'],),
+    return FutureBuilder(
+      future: DBProvider.db.getAllFavorite(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        movies=snapshot.data;
+        return !snapshot.hasData ? Center(child: CircularProgressIndicator(),)
+            : ListView.builder(
+                itemCount: movies==null ? 0 : movies.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Slidable(
+                    actionPane: SlidableDrawerActionPane(),
+                    actionExtentRatio: 0.25,
+                    child: Card(
+                      elevation: 8.0,
+                      margin: EdgeInsets.symmetric(horizontal: 5.0, vertical: 2.5),
+                      child: Container(
+                            // decoration: BoxDecoration(color: Color.fromRGBO(50, 180, 237, .8)),
+                            child: ListTile(
+                              contentPadding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 2.5),
+                              leading: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 27.0),
+                                // decoration: BoxDecoration(
+                                //   border: Border( right: BorderSide(width: 1.0, color: Colors.black))
+                                // ),
+                                child: Icon(Icons.photo, size: 50.00, color: Theme.of(context).textTheme.bodyText1.color,),
+                              ),
+                              title: Text(
+                                movies[index].title,
+                                style: Theme.of(context).textTheme.bodyText1,
+                              ),
+                              subtitle: Row(
+                                children: <Widget>[
+                                  //Icon(Icons.touch_app, color: Colors.yellowAccent),
+                                  Text(movies[index].mediaType, style: Theme.of(context).textTheme.bodyText2)
+                                ],
+                              ),
+                              // trailing: Icon(Icons.keyboard_arrow_right, color: Colors.black, size: 30.0,),
+                            ),
                           ),
-                          title: Text(
-                            movies[index]['name']!=null ? movies[index]['name'] : movies[index]['title'],
-                            style: Theme.of(context).textTheme.bodyText1,
-                          ),
-                          subtitle: Row(
-                            children: <Widget>[
-                              //Icon(Icons.touch_app, color: Colors.yellowAccent),
-                              Text(movies[index]['media_type'], style: Theme.of(context).textTheme.bodyText2)
-                            ],
-                          ),
-                          // trailing: Icon(Icons.keyboard_arrow_right, color: Colors.black, size: 30.0,),
-                        ),
-                      ),
-                ),
-                actions: <Widget>[
-                  IconSlideAction(
+                    ),
+                    actions: <Widget>[
+                      IconSlideAction(
+                    foregroundColor: Colors.red,
                     caption: 'quit of favorite',
-                    color: Color.fromARGB(255, 189, 50, 10),
+                    color: Colors.grey[850],
                     icon: Icons.favorite_border,
                     onTap: () => {
                       // removeItem(index)
                     },
                   ),
                   IconSlideAction(
+                    foregroundColor: Color.fromARGB(255, 23, 162, 184),
                     caption: 'view detail',
-                    color: Color.fromARGB(255, 23, 162, 184),
+                    color: Colors.grey[850],
                     icon: Icons.open_in_new,
                     onTap: () => {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ViewDetails(movies[index]),
+                          builder: (context) => ViewDetails(movies[index].toJson(), false),
                         ),
                       )
                     },
                   ),
-                ],
+                    ],
+                  );
+                }
               );
-            },
+          }
         );
   }
 }
