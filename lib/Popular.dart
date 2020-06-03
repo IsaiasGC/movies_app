@@ -3,6 +3,9 @@ import 'package:flutter_offline/flutter_offline.dart';
 import 'package:movies_app/PopularLine.dart';
 import 'package:movies_app/PopularOffline.dart';
 
+import 'DBProvider.dart';
+import 'MovieApiProvider.dart';
+
 
 class Popular extends StatelessWidget{
   bool hasInternet=false;
