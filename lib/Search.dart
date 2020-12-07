@@ -39,6 +39,7 @@ class Search extends StatelessWidget{
     return Scaffold(
       appBar: AppBar(
         title: Text('Search Movie'),
+        centerTitle: true,
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.search), 

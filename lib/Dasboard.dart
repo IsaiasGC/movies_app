@@ -3,13 +3,13 @@ import 'package:movies_app/Favorite.dart';
 import 'package:movies_app/Popular.dart';
 import 'package:movies_app/Search.dart';
 
-class Dashboard extends StatefulWidget{
+class Dashboard extends StatefulWidget {
   const Dashboard({Key key}) : super(key: key);
   @override
   State<StatefulWidget> createState() => DashboardForm();
 }
 
-class DashboardForm extends State<Dashboard>{
+class DashboardForm extends State<Dashboard> {
   int _currentTabIndex = 0;
 
   @override
@@ -28,7 +28,7 @@ class DashboardForm extends State<Dashboard>{
     final bottomNavBar = BottomNavigationBar(
       items: _kBottmonNavBarItems,
       currentIndex: _currentTabIndex,
-      fixedColor: Colors.blueAccent[100],
+      fixedColor: Colors.white,
       type: BottomNavigationBarType.fixed,
       backgroundColor: Theme.of(context).primaryColor,
       onTap: (int index) {
@@ -38,9 +38,7 @@ class DashboardForm extends State<Dashboard>{
       },
     );
     return Scaffold(
-      body: Center(
-        child: _kTabPages[_currentTabIndex]
-      ),
+      body: Center(child: _kTabPages[_currentTabIndex]),
       bottomNavigationBar: bottomNavBar,
     );
   }

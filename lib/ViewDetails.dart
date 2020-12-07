@@ -156,6 +156,7 @@ class ViewDetailsForm extends State<ViewDetails>{
     return Scaffold(
        appBar: AppBar(
          title: Text(movie['title']),
+         centerTitle: true,
        ),
         body: ListView(
           padding: EdgeInsets.only(bottom: 20),
